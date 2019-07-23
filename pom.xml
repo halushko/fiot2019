@@ -13,6 +13,11 @@
             <artifactId>telegrambots</artifactId>
             <version>4.1</version>
         </dependency>
+        <dependency>
+            <groupId>org.apache.pdfbox</groupId>
+            <artifactId>pdfbox</artifactId>
+            <version>LATEST</version>
+        </dependency>
     </dependencies>
 
     <build>

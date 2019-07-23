@@ -4,9 +4,11 @@ import com.halushko.fiot2019.pk.bot.actions.answers.Answer;
 import com.halushko.fiot2019.pk.bot.actions.answers.Answers;
 import com.halushko.fiot2019.pk.bot.actions.tasks.Task;
 import com.halushko.fiot2019.pk.bot.actions.tasks.Tasks;
+import org.apache.commons.io.FileUtils;
 import org.telegram.telegrambots.ApiContextInitializer;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.TelegramBotsApi;
+import org.telegram.telegrambots.meta.api.methods.GetFile;
 import org.telegram.telegrambots.meta.api.methods.send.SendDocument;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
@@ -14,14 +16,17 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Set;
 
 public class Bot extends TelegramLongPollingBot {
     private static Bot INSTANCE;
-    private Thread messageHandler;
+    private final Thread messageHandler;
 
     public static void main(String[] args) {
         ApiContextInitializer.init();
@@ -42,17 +47,43 @@ public class Bot extends TelegramLongPollingBot {
         messageHandler.start();
     }
 
+    public static File getDocument(String fileId, String fileName) {
+        GetFile uploadedFile = new GetFile();
+        uploadedFile.setFileId(fileId);
+        String uploadedFilePath;
+        try {
+            uploadedFilePath = INSTANCE.execute(uploadedFile).getFilePath();
+        } catch (TelegramApiException e) {
+            e.printStackTrace();
+            return null;
+        }
+
+        File localFile = new File(fileName);
+        try {
+            InputStream is = new URL("https://api.telegram.org/file/bot" + INSTANCE.getBotToken() + "/" + uploadedFilePath).openStream();
+            FileUtils.copyInputStreamToFile(is, localFile);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return localFile;
+    }
+
     private void executeTasks() {
         Set<Task> tasks = Tasks.getScheduled();
 
         try {
             new Thread(() -> {
                 for (Task task : tasks) {
+                    Answer answer = Answers.EMPTY_ANSWER;
                     if (!task.isEdited()) {
-                        Answer answer = Answers.find(task.getUpdate());
-                        answer.answer(task.getMessage());
+                        try {
+                            answer = Answers.find(task.getUpdate());
+                            answer.answer(task.getMessage());
+                        } finally {
+                            Tasks.addToHistory(task, answer);
+                        }
                     } else {
-                        String str = null;
+                        String str;
                         try {
                             str = " або натисніть на " +
                                     "[цей текст](https://t.me/share/url?url=";

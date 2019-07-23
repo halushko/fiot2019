@@ -6,8 +6,6 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 
 import java.util.*;
 
-import static javax.swing.UIManager.get;
-
 public final class Tasks {
     private static final Map<Long, TreeSet<Task>> scheduled = new LinkedHashMap<>();
     private static final Map<Long, TreeMap<String, Answer>> historyAnswer = new HashMap<>();

@@ -1,5 +1,6 @@
-package com.halushko.fiot2019.pk.bot.actions.answers;
+package com.halushko.fiot2019.pk.bot.actions.questions;
 
+import com.halushko.fiot2019.pk.bot.actions.questions.Question;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
 import java.util.regex.Pattern;
@@ -17,7 +18,7 @@ public class RegexpTrigger extends Question<String> {
     }
 
     @Override
-    protected String getAction(Update update) {
+    protected String getInput(Update update) {
         return ifNotEmpty(update) ? update.getMessage().getText() : null;
     }
 

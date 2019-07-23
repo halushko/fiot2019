@@ -1,12 +1,14 @@
 package com.halushko.fiot2019.pk.bot.actions.answers;
 
+import com.halushko.fiot2019.pk.bot.actions.questions.Question;
+import com.halushko.fiot2019.pk.bot.actions.questions.RegexpTrigger;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
 import java.util.*;
 
 public final class Answers {
     private final static Map<Question, Queue<Answer>> answers = new LinkedHashMap<>();
-    private final static Answer EMPTY_ANSWER = new EmptyAnswer();
+    public final static Answer EMPTY_ANSWER = new EmptyAnswer();
 
     private static Map<Question, Queue<Answer>> getAnswers(){
         if(answers.isEmpty()){
@@ -34,6 +36,7 @@ public final class Answers {
         addStart();
         addHelp();
         addRegister();
+        readPDF();
     }
 
     private static void addHelp() {
@@ -59,5 +62,11 @@ public final class Answers {
         myAnswers.add(new TextAnswer("Ласкаво просимо до приймальної комісії ФІОТ!"));
         myAnswers.add(new TextAnswer("Вітаємо у приймальній комісії ФІОТ!"));
         Answers.answers.put(new RegexpTrigger("/start"), myAnswers);
+    }
+
+    private static void readPDF(){
+        Queue<Answer> myAnswers = new LinkedList<>();
+        myAnswers.add(new ReadPDF());
+        Answers.answers.put(new com.halushko.fiot2019.pk.bot.actions.questions.ReadPDF(), myAnswers);
     }
 }
