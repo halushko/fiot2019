@@ -10,6 +10,6 @@ public class TextAnswer extends Answer<String> {
 
     @Override
     protected void answer(String answer, Message msg) {
-        Bot.sendTextMessage(msg.getChatId(), answer);
+        Bot.sendTextMessage(msg.getChatId(), null, answer, null);
     }
 }

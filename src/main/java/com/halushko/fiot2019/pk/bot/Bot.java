@@ -14,39 +14,72 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.io.File;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Set;
 
 public class Bot extends TelegramLongPollingBot {
     private static Bot INSTANCE;
-    private final Thread taskRunner;
+    private Thread messageHandler;
 
     public static void main(String[] args) {
         ApiContextInitializer.init();
+        getInstance();
     }
 
-    private Bot(){
-        taskRunner = new Thread(() -> {
-            executeTasks();
-            try {
-                Thread.sleep(1);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+    private Bot() {
+        messageHandler = new Thread(() -> {
+            for (; ; ) {
+                executeTasks();
+                try {
+                    Thread.sleep(200);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
         });
-        taskRunner.start();
+        messageHandler.start();
     }
 
     private void executeTasks() {
-        Set<Task> tasks = Tasks.getTasks();
-        for(Task task: tasks){
-            if(!task.isEdited()){
-                Answer answer = Answers.find(task.getUpdate());
-            }
+        Set<Task> tasks = Tasks.getScheduled();
+
+        try {
+            new Thread(() -> {
+                for (Task task : tasks) {
+                    if (!task.isEdited()) {
+                        Answer answer = Answers.find(task.getUpdate());
+                        answer.answer(task.getMessage());
+                    } else {
+                        String str = null;
+                        try {
+                            str = " або натисніть на " +
+                                    "[цей текст](https://t.me/share/url?url=";
+                            str += URLEncoder.encode(task.getMessage().getText(), StandardCharsets.UTF_8.toString());
+                            str += ") та виберіть серед переліку чатів нашого бота.";
+                        } catch (UnsupportedEncodingException e) {
+                            str = "";
+                        }
+                        Bot.sendTextMessage(
+                                task.getUserId(),
+                                task.getMessage().getMessageId(),
+                                "Виправлення вже відправлених повідомлень не приймаються до оброблень задля уникнення " +
+                                        "розбіжностей у введених даних. Будь ласка, якщо необхідно виконати якусь дію, то надсилайте " +
+                                        "запити новими повідомленнями, а не виправляйте старі. Дякуємо за розуміння!\n\n" +
+                                        "Щоб наліслати виправлене повідомлення як нове скопіюйте його" + str,
+                                str.equals("") ? null : "markdown"
+                        );
+                    }
+                }
+            }).start();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
-    private static Bot getInstance(){
-        if(INSTANCE == null) {
+    private static Bot getInstance() {
+        if (INSTANCE == null) {
             try {
                 INSTANCE = new Bot();
                 new TelegramBotsApi().registerBot(INSTANCE);
@@ -58,11 +91,11 @@ public class Bot extends TelegramLongPollingBot {
         return INSTANCE;
     }
 
-    public static void sendTextMessage(long chatId, String text, String... params) {
+    public static void sendTextMessage(long chatId, Integer replyTo, String text, String parsMode) {
         try {
             SendMessage send = new SendMessage().setChatId(chatId);
-            if(params != null && params.length > 0)
-                if(params[0] != null) send.setParseMode(params[0]);
+            if (parsMode != null) send.setParseMode(parsMode);
+            if (replyTo != null) send.setReplyToMessageId(replyTo);
             send.setText(text);
             getInstance().execute(send);
         } catch (Exception ignored) {
@@ -86,11 +119,11 @@ public class Bot extends TelegramLongPollingBot {
 
     @Override
     public String getBotUsername() {
-        return null;
+        return "FIOT2019bot";
     }
 
     @Override
     public String getBotToken() {
-        return null;
+        return "845137922:AAEC0jqOoUREu0-pl4d3QTsfUO81HnlIPmM";
     }
 }

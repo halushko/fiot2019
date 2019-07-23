@@ -2,35 +2,42 @@ package com.halushko.fiot2019.pk.bot.actions.tasks;
 
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import javax.validation.constraints.NotNull;
+import java.util.Random;
 
 public class Task {
-    private final Long id;
+    private final static Random RANDOM = new Random();
+    private final String taskId;
+    private final Long userId;
     private final Update update;
-    private final Integer date;
+    private final Message message;
     private final boolean isEdited;
 
     public Task(@NotNull Update update){
         this.update = update;
-        Message msg;
         if(update.hasMessage()) {
-            msg = update.getMessage();
+            message = update.getMessage();
             isEdited = false;
         } else if (update.hasEditedMessage()){
-            msg = update.getEditedMessage();
+            message = update.getEditedMessage();
             isEdited = true;
         } else {
-            isEdited = false;
-            msg = null;
+            throw new NotImplementedException();
         }
 
-        this.id = msg != null ? msg.getChatId() : null;
-        this.date = msg != null ? msg.getDate() : null;
+
+        this.userId = message.getChatId();
+        taskId = "ti" + getDate() + getUserId() + RANDOM.nextInt(1000);
     }
 
-    public Long getId(){
-        return id;
+    public String getTaskId(){
+        return taskId;
+    }
+
+    public Long getUserId(){
+        return userId;
     }
 
     public Update getUpdate(){
@@ -38,7 +45,11 @@ public class Task {
     }
 
     public Integer getDate() {
-        return date;
+        return getMessage().getDate();
+    }
+
+    public Message getMessage() {
+        return message;
     }
 
     public boolean isEdited(){

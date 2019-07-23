@@ -8,7 +8,6 @@ public class RegexpTrigger extends Question<String> {
     private final Pattern pattern;
 
     public RegexpTrigger(String input) {
-        super(String.class);
         this.pattern = Pattern.compile((input == null ? "" : input).trim().toLowerCase());
     }
 

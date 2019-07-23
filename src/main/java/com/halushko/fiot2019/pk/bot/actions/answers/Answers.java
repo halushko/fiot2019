@@ -32,14 +32,32 @@ public final class Answers {
 
     private static void initialize(){
         addStart();
+        addHelp();
+        addRegister();
     }
 
+    private static void addHelp() {
+        Answer help = new TextAnswer("Для реєстрації у черзі натисніть /register");
+        Queue<Answer> myAnswers = new LinkedList<>();
+        myAnswers.add(help);
 
+        Answers.answers.put(new RegexpTrigger("/help"), myAnswers);
+        Answers.answers.put(new RegexpTrigger("допомога"), myAnswers);
+    }
+
+    private static void addRegister() {
+        Answer help = new TextAnswer("Наразі реєстрація закрита");
+        Queue<Answer> myAnswers = new LinkedList<>();
+        myAnswers.add(help);
+
+        Answers.answers.put(new RegexpTrigger("/register"), myAnswers);
+        Answers.answers.put(new RegexpTrigger("реєстрація"), myAnswers);
+    }
 
     private static void addStart(){
-        Answer start = new TextAnswer("Ласкаво просимо до приймальної комісії ФІОТ!");
         Queue<Answer> myAnswers = new LinkedList<>();
-        myAnswers.add(start);
+        myAnswers.add(new TextAnswer("Ласкаво просимо до приймальної комісії ФІОТ!"));
+        myAnswers.add(new TextAnswer("Вітаємо у приймальній комісії ФІОТ!"));
         Answers.answers.put(new RegexpTrigger("/start"), myAnswers);
     }
 }
