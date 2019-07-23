@@ -13,7 +13,7 @@ public class RegexpTrigger extends Question<String> {
     }
 
     @Override
-    protected boolean validate(String input) {
+    protected boolean validateRealisation(String input) {
         return input != null && pattern.matcher(input).matches();
     }
 

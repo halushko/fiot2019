@@ -6,10 +6,10 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 
 import java.io.IOException;
 
-public class ReadPDF extends Question<java.io.File> {
+public class IsPDF extends Question<java.io.File> {
 
     @Override
-    protected boolean validate(java.io.File input) {
+    protected boolean validateRealisation(java.io.File input) {
         try {
             return input != null && PDDocument.load(input) != null;
         } catch (IOException e) {

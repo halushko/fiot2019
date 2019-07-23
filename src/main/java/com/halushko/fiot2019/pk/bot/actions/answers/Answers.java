@@ -1,6 +1,8 @@
 package com.halushko.fiot2019.pk.bot.actions.answers;
 
+import com.halushko.fiot2019.pk.bot.actions.questions.IsEditedMessage;
 import com.halushko.fiot2019.pk.bot.actions.questions.Question;
+import com.halushko.fiot2019.pk.bot.actions.questions.IsPDF;
 import com.halushko.fiot2019.pk.bot.actions.questions.RegexpTrigger;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
@@ -33,10 +35,22 @@ public final class Answers {
     }
 
     private static void initialize(){
+        editedMessages();
         addStart();
         addHelp();
         addRegister();
         readPDF();
+    }
+
+    private static void editedMessages() {
+        String text = "Виправлення вже відправлених повідомлень не приймаються до оброблень задля уникнення " +
+                "розбіжностей у введених даних. Будь ласка, якщо необхідно виконати якусь дію, то надсилайте " +
+                "запити новими повідомленнями, а не виправляйте старі. Дякуємо за розуміння!\n\n" +
+                "Щоб наліслати виправлене повідомлення як нове можете просто скопіювати його";
+        Queue<Answer> myAnswers = new LinkedList<>();
+        myAnswers.add(new AnswerToEditedMessage(text));
+
+        Answers.answers.put(new IsEditedMessage(), myAnswers);
     }
 
     private static void addHelp() {
@@ -67,6 +81,6 @@ public final class Answers {
     private static void readPDF(){
         Queue<Answer> myAnswers = new LinkedList<>();
         myAnswers.add(new FindStudentsInPDF());
-        Answers.answers.put(new com.halushko.fiot2019.pk.bot.actions.questions.ReadPDF(), myAnswers);
+        Answers.answers.put(new IsPDF(), myAnswers);
     }
 }

@@ -18,15 +18,12 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
 import java.net.URL;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.util.Set;
 
 public class Bot extends TelegramLongPollingBot {
     private static Bot INSTANCE;
-    private final Thread messageHandler;
+//    private final Thread messageHandler;
 
     public static void main(String[] args) {
         ApiContextInitializer.init();
@@ -34,7 +31,7 @@ public class Bot extends TelegramLongPollingBot {
     }
 
     private Bot() {
-        messageHandler = new Thread(() -> {
+        new Thread(() -> {
             for (; ; ) {
                 executeTasks();
                 try {
@@ -43,8 +40,7 @@ public class Bot extends TelegramLongPollingBot {
                     e.printStackTrace();
                 }
             }
-        });
-        messageHandler.start();
+        }).start();
     }
 
     public static File getDocument(String fileId, String fileName) {
@@ -69,38 +65,17 @@ public class Bot extends TelegramLongPollingBot {
     }
 
     private void executeTasks() {
-        Set<Task> tasks = Tasks.getScheduled();
+        Set<Task> tasks = Tasks.getUnreadMessages();
 
         try {
             new Thread(() -> {
                 for (Task task : tasks) {
                     Answer answer = Answers.EMPTY_ANSWER;
-                    if (!task.isEdited()) {
-                        try {
-                            answer = Answers.find(task.getUpdate());
-                            answer.answer(task.getMessage());
-                        } finally {
-                            Tasks.addToHistory(task, answer);
-                        }
-                    } else {
-                        String str;
-                        try {
-                            str = " або натисніть на " +
-                                    "[цей текст](https://t.me/share/url?url=";
-                            str += URLEncoder.encode(task.getMessage().getText(), StandardCharsets.UTF_8.toString());
-                            str += ") та виберіть серед переліку чатів нашого бота.";
-                        } catch (UnsupportedEncodingException e) {
-                            str = "";
-                        }
-                        Bot.sendTextMessage(
-                                task.getUserId(),
-                                task.getMessage().getMessageId(),
-                                "Виправлення вже відправлених повідомлень не приймаються до оброблень задля уникнення " +
-                                        "розбіжностей у введених даних. Будь ласка, якщо необхідно виконати якусь дію, то надсилайте " +
-                                        "запити новими повідомленнями, а не виправляйте старі. Дякуємо за розуміння!\n\n" +
-                                        "Щоб наліслати виправлене повідомлення як нове скопіюйте його" + str,
-                                str.equals("") ? null : "markdown"
-                        );
+                    try {
+                        answer = Answers.find(task.getUpdate());
+                        answer.answer(task.getMessage());
+                    } finally {
+                        Tasks.addToHistory(task, answer);
                     }
                 }
             }).start();

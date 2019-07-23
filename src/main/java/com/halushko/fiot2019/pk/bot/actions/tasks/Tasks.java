@@ -7,36 +7,36 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import java.util.*;
 
 public final class Tasks {
-    private static final Map<Long, TreeSet<Task>> scheduled = new LinkedHashMap<>();
-    private static final Map<Long, TreeMap<String, Answer>> historyAnswer = new HashMap<>();
-    private static final Map<Long, TreeMap<String, Task>> historyTask = new HashMap<>();
+    private static final Map<Long, TreeSet<Task>> unreadMessages = new LinkedHashMap<>();
+    private static final Map<Long, TreeMap<String, Task>> readMessages = new HashMap<>();
+    private static final Map<Long, TreeMap<String, Answer>> answers = new HashMap<>();
 
     public static boolean addToHistory(Task task, Answer answer){
         Long userId = task.getUserId();
-        if(!historyAnswer.containsKey(userId)){
-            historyAnswer.put(userId, new TreeMap<>());
+        if(!answers.containsKey(userId)){
+            answers.put(userId, new TreeMap<>());
         }
-        return historyAnswer.get(userId).put(task.getTaskId(), answer) == null;
+        return answers.get(userId).put(task.getTaskId(), answer) == null;
     }
 
     public static boolean add(Update update) {
         if (update == null) return false;
         Task t = new Task(update);
         if (t.getUserId() == null) return false;
-        if (!scheduled.containsKey(t.getUserId())) {
-            scheduled.put(t.getUserId(), new TreeSet<>(Task::compareTo));
+        if (!unreadMessages.containsKey(t.getUserId())) {
+            unreadMessages.put(t.getUserId(), new TreeSet<>(Task::compareTo));
         }
-        return scheduled.get(t.getUserId()).add(t);
+        return unreadMessages.get(t.getUserId()).add(t);
     }
 
-    public static Set<Task> getScheduled() {
-        if (scheduled.isEmpty()) {
+    public static Set<Task> getUnreadMessages() {
+        if (unreadMessages.isEmpty()) {
             return new HashSet<>();
         }
         List<Long> idsToRemove = new ArrayList<>();
         TreeSet<Task> result = null;
         Long id = null;
-        for (Map.Entry<Long, TreeSet<Task>> a : scheduled.entrySet()) {
+        for (Map.Entry<Long, TreeSet<Task>> a : unreadMessages.entrySet()) {
             id = a.getKey();
             idsToRemove.add(id);
             if (a.getValue().size() > 5) {
@@ -45,10 +45,10 @@ public final class Tasks {
                 id = null;
             } else {
                 result = a.getValue();
-                if(!historyTask.containsKey(id)){
-                    historyTask.put(id, new TreeMap<>());
+                if(!readMessages.containsKey(id)){
+                    readMessages.put(id, new TreeMap<>());
                 }
-                TreeMap<String, Task> history = historyTask.get(id);
+                TreeMap<String, Task> history = readMessages.get(id);
                 for (Task t: result) {
                     history.put(t.getTaskId(), t);
                 }
@@ -56,7 +56,7 @@ public final class Tasks {
             }
         }
 
-        idsToRemove.forEach(scheduled::remove);
+        idsToRemove.forEach(unreadMessages::remove);
         return id != null ? result : new HashSet<>();
     }
 }
