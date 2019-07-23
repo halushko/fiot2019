@@ -66,7 +66,7 @@ public final class Answers {
 
     private static void readPDF(){
         Queue<Answer> myAnswers = new LinkedList<>();
-        myAnswers.add(new ReadPDF());
+        myAnswers.add(new FindStudentsInPDF());
         Answers.answers.put(new com.halushko.fiot2019.pk.bot.actions.questions.ReadPDF(), myAnswers);
     }
 }

@@ -12,8 +12,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-public class ReadPDF extends Answer<Void> {
-    public ReadPDF() {
+public class FindStudentsInPDF extends Answer<Void> {
+    public FindStudentsInPDF() {
         super(Void.class, null);
     }
 
