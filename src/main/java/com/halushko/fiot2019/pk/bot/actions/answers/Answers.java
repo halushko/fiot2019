@@ -63,9 +63,9 @@ public final class Answers {
     }
 
     private static void addRegister() {
-        Answer help = new TextAnswer("Наразі реєстрація закрита");
+//        Answer help = new TextAnswer("Наразі реєстрація закрита");
         Queue<Answer> myAnswers = new LinkedList<>();
-        myAnswers.add(help);
+        myAnswers.add(new Register());
 
         Answers.answers.put(new RegexpTrigger("/register"), myAnswers);
         Answers.answers.put(new RegexpTrigger("реєстрація"), myAnswers);

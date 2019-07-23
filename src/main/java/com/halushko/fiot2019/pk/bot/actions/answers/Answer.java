@@ -9,9 +9,10 @@ public abstract class Answer<T> {
         this.answer = answer;
     }
 
-    public final void answer(Message msg) {
-        answer(answer, msg);
+    public final Message answer(Message msg) {
+        return answer(answer, msg);
     }
 
-    protected abstract void answer(T answer, Message msg);
+    public abstract String getKey();
+    protected abstract Message answer(T answer, Message msg);
 }

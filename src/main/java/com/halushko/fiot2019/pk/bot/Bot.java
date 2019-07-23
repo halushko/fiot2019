@@ -70,13 +70,8 @@ public class Bot extends TelegramLongPollingBot {
         try {
             new Thread(() -> {
                 for (Task task : tasks) {
-                    Answer answer = Answers.EMPTY_ANSWER;
-                    try {
-                        answer = Answers.find(task.getUpdate());
-                        answer.answer(task.getMessage());
-                    } finally {
-                        Tasks.addToHistory(task, answer);
-                    }
+                    Answer a = Answers.find(task.getUpdate());
+                    Tasks.saveAnswer(task, a.answer(task.getMessage()), a.getKey());
                 }
             }).start();
         } catch (Exception e) {
@@ -97,14 +92,15 @@ public class Bot extends TelegramLongPollingBot {
         return INSTANCE;
     }
 
-    public static void sendTextMessage(long chatId, Integer replyTo, String text, String parsMode) {
+    public static Message sendTextMessage(long chatId, Integer replyTo, String text, String parsMode) {
         try {
             SendMessage send = new SendMessage().setChatId(chatId);
             if (parsMode != null) send.setParseMode(parsMode);
             if (replyTo != null) send.setReplyToMessageId(replyTo);
             send.setText(text);
-            getInstance().execute(send);
+            return getInstance().execute(send);
         } catch (Exception ignored) {
+            return null;
         }
     }
 

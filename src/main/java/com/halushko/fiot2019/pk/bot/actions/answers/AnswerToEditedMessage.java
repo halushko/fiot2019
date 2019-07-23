@@ -13,7 +13,12 @@ public class AnswerToEditedMessage extends Answer<String> {
     }
 
     @Override
-    protected void answer(String answer, Message msg) {
+    public String getKey() {
+        return "Warning";
+    }
+
+    @Override
+    protected Message answer(String answer, Message msg) {
         String str;
         try {
             str = " або натисніть на " +
@@ -23,7 +28,7 @@ public class AnswerToEditedMessage extends Answer<String> {
         } catch (UnsupportedEncodingException e) {
             str = "";
         }
-        Bot.sendTextMessage(
+        return Bot.sendTextMessage(
                 msg.getChatId(),
                 msg.getMessageId(),
                 answer + str,

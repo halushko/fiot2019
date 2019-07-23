@@ -2,22 +2,20 @@ package com.halushko.fiot2019.pk.bot.actions.tasks;
 
 import com.halushko.fiot2019.pk.bot.Bot;
 import com.halushko.fiot2019.pk.bot.actions.answers.Answer;
+import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public final class Tasks {
     private static final Map<Long, TreeSet<Task>> unreadMessages = new LinkedHashMap<>();
     private static final Map<Long, TreeMap<String, Task>> readMessages = new HashMap<>();
-    private static final Map<Long, TreeMap<String, Answer>> answers = new HashMap<>();
+    private static final Map<Long, TreeMap<String, Message>> answers = new HashMap<>();
+    private static final Map<Long, HashMap<String, TreeSet<String>>> answersByKey = new HashMap<>();
+    private static final Map<Long, UserInfo> users = new HashMap<>();
 
-    public static boolean addToHistory(Task task, Answer answer){
-        Long userId = task.getUserId();
-        if(!answers.containsKey(userId)){
-            answers.put(userId, new TreeMap<>());
-        }
-        return answers.get(userId).put(task.getTaskId(), answer) == null;
-    }
+
 
     public static boolean add(Update update) {
         if (update == null) return false;
@@ -27,6 +25,22 @@ public final class Tasks {
             unreadMessages.put(t.getUserId(), new TreeSet<>(Task::compareTo));
         }
         return unreadMessages.get(t.getUserId()).add(t);
+    }
+
+    public static boolean saveAnswer(Task task, Message answer, String keyOfTask){
+        if(task == null || answer == null) return false;
+        Long userId = task.getUserId();
+        if(!answers.containsKey(userId)){
+            answers.put(userId, new TreeMap<>());
+            answersByKey.put(userId, new HashMap<>());
+            users.put(userId, new UserInfo(userId));
+        }
+        if(!answersByKey.get(userId).containsKey(keyOfTask)){
+            answersByKey.get(userId).put(keyOfTask, new TreeSet<>());
+        }
+
+        answersByKey.get(userId).get(keyOfTask).add(task.getTaskId());
+        return answers.get(userId).put(task.getTaskId(), answer) == null;
     }
 
     public static Set<Task> getUnreadMessages() {
@@ -58,5 +72,24 @@ public final class Tasks {
 
         idsToRemove.forEach(unreadMessages::remove);
         return id != null ? result : new HashSet<>();
+    }
+
+    public static UserInfo getUser(Long userId){
+        if(!users.containsKey(userId)){
+            users.put(userId, new UserInfo(userId));
+        }
+        return users.get(userId);
+    }
+    public static Set<Message> getAnswersToUserByKey(Long userId, String keyOfTask){
+        Set<Message> set = new HashSet<>();
+        if(answersByKey.containsKey(userId) && answersByKey.get(userId).containsKey(keyOfTask)) {
+            for (String id : answersByKey.get(userId).get(keyOfTask)) {
+                Message message = answers.get(userId).get(id);
+                if (message != null) {
+                    set.add(message);
+                }
+            }
+        }
+        return set;
     }
 }

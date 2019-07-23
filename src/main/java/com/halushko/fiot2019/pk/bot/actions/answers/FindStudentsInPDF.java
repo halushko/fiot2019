@@ -13,12 +13,17 @@ import java.util.Map;
 import java.util.TreeMap;
 
 public class FindStudentsInPDF extends Answer<Void> {
-    public FindStudentsInPDF() {
+    FindStudentsInPDF() {
         super(Void.class, null);
     }
 
     @Override
-    protected void answer(Void answer, Message msg) {
+    public String getKey() {
+        return "INNER";
+    }
+
+    @Override
+    protected Message answer(Void answer, Message msg) {
         File pdf = Bot.getDocument(
                 msg.getDocument().getFileId(),
                 msg.getDocument().getFileName()
@@ -67,7 +72,7 @@ public class FindStudentsInPDF extends Answer<Void> {
             info += "З " + a.getKey() + " номерами є " + a.getValue() + " сторінок\n";
         }
 
-        Bot.sendTextMessage(
+        return Bot.sendTextMessage(
                 msg.getChatId(),
                 null,
                 "Кількість сторінок: " + pageUser.size() + "\n" +

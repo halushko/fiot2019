@@ -8,7 +8,12 @@ public final class EmptyAnswer extends Answer<String> {
     }
 
     @Override
-    protected void answer(String answer, Message msg) {
+    public String getKey() {
+        return "NULL";
+    }
 
+    @Override
+    protected Message answer(String answer, Message msg) {
+        return null;
     }
 }
