@@ -1,6 +1,7 @@
 package com.halushko.fiot2019.pk.bot.actions.answers;
 
 import com.halushko.fiot2019.pk.bot.Bot;
+import com.halushko.fiot2019.pk.bot.actions.entities.AnswerInDB;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
 import org.telegram.telegrambots.meta.api.objects.Message;
@@ -14,7 +15,7 @@ import java.util.TreeMap;
 
 public class FindStudentsInPDF extends Answer<Void> {
     FindStudentsInPDF() {
-        super(Void.class, null);
+        super(null);
     }
 
     @Override

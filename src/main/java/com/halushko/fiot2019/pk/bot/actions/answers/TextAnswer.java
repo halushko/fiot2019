@@ -5,7 +5,7 @@ import org.telegram.telegrambots.meta.api.objects.Message;
 
 public class TextAnswer extends Answer<String> {
     TextAnswer(String answer) {
-        super(String.class, answer);
+        super(answer);
     }
 
     @Override

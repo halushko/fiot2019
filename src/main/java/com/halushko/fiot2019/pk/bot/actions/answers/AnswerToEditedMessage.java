@@ -1,6 +1,7 @@
 package com.halushko.fiot2019.pk.bot.actions.answers;
 
 import com.halushko.fiot2019.pk.bot.Bot;
+import com.halushko.fiot2019.pk.bot.actions.entities.AnswerInDB;
 import org.telegram.telegrambots.meta.api.objects.Message;
 
 import java.io.UnsupportedEncodingException;
@@ -9,7 +10,7 @@ import java.nio.charset.StandardCharsets;
 
 public class AnswerToEditedMessage extends Answer<String> {
     AnswerToEditedMessage(String answer) {
-        super(String.class, answer);
+        super(answer);
     }
 
     @Override

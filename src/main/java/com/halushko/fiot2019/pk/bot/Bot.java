@@ -2,8 +2,9 @@ package com.halushko.fiot2019.pk.bot;
 
 import com.halushko.fiot2019.pk.bot.actions.answers.Answer;
 import com.halushko.fiot2019.pk.bot.actions.answers.Answers;
-import com.halushko.fiot2019.pk.bot.actions.tasks.Task;
-import com.halushko.fiot2019.pk.bot.actions.tasks.Tasks;
+import com.halushko.fiot2019.pk.bot.actions.entities.Task;
+import com.halushko.fiot2019.pk.bot.db.DBClass;
+import com.halushko.fiot2019.pk.bot.db.DBUtil;
 import org.apache.commons.io.FileUtils;
 import org.telegram.telegrambots.ApiContextInitializer;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
@@ -22,15 +23,23 @@ import java.net.URL;
 import java.util.Set;
 
 public class Bot extends TelegramLongPollingBot {
+//    private static final int SECONDS_TO_CREATE_NEW_THREAD = 10;
+//    private static final int SECONDS_TO_KILL = 1;
+//    private static final int MAXIMUM_NUMBER_OF_THREADS = 8;
+
     private static Bot INSTANCE;
-//    private final Thread messageHandler;
+
+
+//    private Thread messageHandler;
 
     public static void main(String[] args) {
         ApiContextInitializer.init();
+        DBClass.init();
         getInstance();
     }
 
     private Bot() {
+
         new Thread(() -> {
             for (; ; ) {
                 executeTasks();
@@ -65,13 +74,13 @@ public class Bot extends TelegramLongPollingBot {
     }
 
     private void executeTasks() {
-        Set<Task> tasks = Tasks.getUnreadMessages();
+        Set<Task> tasks = Task.unreadMessages();
 
         try {
             new Thread(() -> {
                 for (Task task : tasks) {
                     Answer a = Answers.find(task.getUpdate());
-                    Tasks.saveAnswer(task, a.answer(task.getMessage()), a.getKey());
+                    DBUtil.getInstance().insert(a.answer(task.getMessage()));
                 }
             }).start();
         } catch (Exception e) {
@@ -115,7 +124,7 @@ public class Bot extends TelegramLongPollingBot {
 
     @Override
     public void onUpdateReceived(Update update) {
-        Tasks.add(update);
+        Task.add(update);
     }
 
     @Override
