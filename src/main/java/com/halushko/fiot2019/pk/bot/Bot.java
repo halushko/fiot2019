@@ -23,14 +23,7 @@ import java.net.URL;
 import java.util.Set;
 
 public class Bot extends TelegramLongPollingBot {
-//    private static final int SECONDS_TO_CREATE_NEW_THREAD = 10;
-//    private static final int SECONDS_TO_KILL = 1;
-//    private static final int MAXIMUM_NUMBER_OF_THREADS = 8;
-
     private static Bot INSTANCE;
-
-
-//    private Thread messageHandler;
 
     public static void main(String[] args) {
         ApiContextInitializer.init();
@@ -69,6 +62,7 @@ public class Bot extends TelegramLongPollingBot {
             FileUtils.copyInputStreamToFile(is, localFile);
         } catch (IOException e) {
             e.printStackTrace();
+            return null;
         }
         return localFile;
     }
@@ -80,7 +74,7 @@ public class Bot extends TelegramLongPollingBot {
             new Thread(() -> {
                 for (Task task : tasks) {
                     Answer a = Answers.find(task.getUpdate());
-                    DBUtil.getInstance().insert(a.answer(task.getMessage()));
+                    DBUtil.getInstance().insert(a.answer(task));
                 }
             }).start();
         } catch (Exception e) {

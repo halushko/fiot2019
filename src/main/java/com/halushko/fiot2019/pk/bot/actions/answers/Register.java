@@ -1,12 +1,10 @@
 package com.halushko.fiot2019.pk.bot.actions.answers;
 
 import com.halushko.fiot2019.pk.bot.Bot;
-import com.halushko.fiot2019.pk.bot.actions.entities.AnswerInDB;
+import com.halushko.fiot2019.pk.bot.actions.entities.Task;
 import com.halushko.fiot2019.pk.bot.actions.entities.UserInfo;
 import com.halushko.fiot2019.pk.bot.db.DBUtil;
 import org.telegram.telegrambots.meta.api.objects.Message;
-
-import java.util.Set;
 
 public class Register extends Answer<Object> {
     Register() {
@@ -15,41 +13,42 @@ public class Register extends Answer<Object> {
 
     @Override
     public String getKey() {
-        return "REGISTER";
+        return "NAME";
     }
 
     @Override
-    protected Message answer(Object answer, Message msg) {
-        UserInfo user = UserInfo.getById(msg.getChatId());
-        if(user == null) {
-            user = new UserInfo(msg.getChatId());
+    protected Message answer(Object answer, Task msg) {
+        UserInfo user = UserInfo.getById(msg.getUserId());
+        if (user == null) {
+            user = new UserInfo(msg.getUserId());
             DBUtil.getInstance().insert(user);
         }
 
-        if(user.getNumber() .equals(Integer.MAX_VALUE) ) {
-            return registerUser(msg);
-        } else {
-            Set<AnswerInDB> previousAnswers = AnswerInDB.getAnswersToUserByKey(msg.getChatId(), getKey());
-            if(previousAnswers.size() > 0) {
-                return alreadyRegistered(previousAnswers.stream().findFirst().get());
-            } else {
-                return Bot.sendTextMessage(msg.getChatId(), null, "Щось пішло не так, бот не може знайти Ваш номер.", null);
-            }
+        return registerUser(msg);
+    }
+
+    private Message registerUser(Task task) {
+        String textMessage =
+                (task.getText() == null ? "" : task.getText().trim().toLowerCase()).
+                        replaceAll("^/name ", "").
+                        replaceAll("^піб ", "").
+                        replaceAll("\\s+", " ");
+        StringBuilder capitalizeWord = new StringBuilder();
+
+        for (String w : textMessage.split(" ")) {
+            String first = w.substring(0, 1);
+            capitalizeWord.append(first.toUpperCase()).append(w.substring(1)).append(" ");
         }
-    }
 
-    private Message alreadyRegistered(AnswerInDB reg) {
-        String text = "Ви вже зареєстровані. Якщо ваша черга вже давно пройшла, то перереєструйтесь " +
-            "якщо ви натиснули помилково, то нічого не робіть. Якщо щось не зрозуміло, то можете звернутися до " +
-                "консультантів за допомогою.";
-        return Bot.sendTextMessage(reg.userId, reg.messageId, text, null);
-    }
-
-    //TODO
-    private Message registerUser(Message msg) {
-        int number = 12100042;
-        String text = "Ви стали в електронну чергу. Ваш номер: " + number + ". Наразі перед вами 3 абітурієнти.";
-        UserInfo.getById(msg.getChatId()).setNumber(number);
-        return Bot.sendTextMessage(msg.getChatId(), null, text, null);
+        capitalizeWord = new StringBuilder(capitalizeWord.toString().trim());
+        if (capitalizeWord.toString().matches("\\s*\\S+\\s+\\S+\\s+\\S+\\s*")) {
+            String text = "Ви зареєструвалися у боті приймальної комісії ФІОТ. Ваше ім'я: " + capitalizeWord;
+            UserInfo.getById(task.getUserId()).setName(capitalizeWord.toString());
+            return Bot.sendTextMessage(task.getUserId(), task.getMessageId(), text, null);
+        } else {
+            String t = "Помилка \uD83D\uDE15\nДля реєстрації введіть свої ПІБ у форматі:\n/name Петренко Петро Петрович\n\tабо ПІБ Петренко Петро Петрович";
+            t += "\nРеєстрація у Телегам не є обов'язковую, та вона покращить та пришвидчить прийом Ваших документів.";
+            return Bot.sendTextMessage(task.getUserId(), task.getMessageId(), t, null);
+        }
     }
 }

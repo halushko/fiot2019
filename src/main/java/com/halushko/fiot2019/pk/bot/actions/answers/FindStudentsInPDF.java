@@ -1,7 +1,7 @@
 package com.halushko.fiot2019.pk.bot.actions.answers;
 
 import com.halushko.fiot2019.pk.bot.Bot;
-import com.halushko.fiot2019.pk.bot.actions.entities.AnswerInDB;
+import com.halushko.fiot2019.pk.bot.actions.entities.Task;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
 import org.telegram.telegrambots.meta.api.objects.Message;
@@ -24,25 +24,30 @@ public class FindStudentsInPDF extends Answer<Void> {
     }
 
     @Override
-    protected Message answer(Void answer, Message msg) {
+    protected Message answer(Void answer, Task task) {
+        if(task.getMessage() == null) {
+            return Bot.sendTextMessage(task.getUserId(), null, "Спробуйте знову", null);
+        }
+        Message msg = task.getMessage();
         File pdf = Bot.getDocument(
                 msg.getDocument().getFileId(),
                 msg.getDocument().getFileName()
         );
+        if(pdf == null) {
+            return Bot.sendTextMessage(task.getUserId(), null, "Не валося проаналізувати файл. Можливо Вам нема необхвдності це робити", null);
+        }
         Map<Integer, List<Integer>> pageUser = new TreeMap<>();
         try {
             PDDocument document = PDDocument.load(pdf);
             for (int page = 0; page < document.getNumberOfPages(); page++) {
                 int currentPage = page + 1;
                 List<Integer> users = new ArrayList<>();
-                int count = 0;
                 PDFTextStripper s = new PDFTextStripper();
                 s.setStartPage(currentPage);
                 s.setEndPage(currentPage);
                 for (String word : s.getText(document).split("\\s+")) {
                     if (word != null) {
                         if (word.matches("\\d{7}")) {
-                            count++;
                             users.add(new Integer(word));
                         }
                     }
@@ -68,9 +73,9 @@ public class FindStudentsInPDF extends Answer<Void> {
             }
         }
 
-        String info = "";
+        StringBuilder info = new StringBuilder();
         for (Map.Entry<Integer, Integer> a : counter.entrySet()) {
-            info += "З " + a.getKey() + " номерами є " + a.getValue() + " сторінок\n";
+            info.append("З ").append(a.getKey()).append(" номерами є ").append(a.getValue()).append(" сторінок\n");
         }
 
         return Bot.sendTextMessage(
@@ -82,7 +87,7 @@ public class FindStudentsInPDF extends Answer<Void> {
                         "Кількість абітурієнтів: " + counter.entrySet().stream().mapToInt(c -> c.getKey() * c.getValue()).sum() + "\n" +
                         "Перший номер: " + pageUser.get(firstPage).get(0) + "\n" +
                         "Останній номер: " + pageUser.get(lastPage).get(pageUser.get(lastPage).size() - 1) + "\n" +
-                        info.trim(),
+                        info.toString().trim(),
                 null);
     }
 }

@@ -12,21 +12,28 @@ public final class UserInfo extends DBClass<UserInfo> {
     public static final UserInfo INSTANCE = new UserInfo(new Document());
 
     public final Long userId;
-    private Integer number = Integer.MAX_VALUE;
+    private String number = "";
     private String name = "";
+    private String spec = "";
     private static boolean isIndexesHasBeenGenerated = false;
 
     public UserInfo(Document doc) {
-        this.userId = doc.getLong(USER_ID_FIELD);
-        this.number = doc.getInteger(NUMBER_FIELD);
+        if(doc == null) {
+            this.userId = Long.MAX_VALUE;
+            return;
+        } else  {
+            this.userId = doc.getLong(USER_ID_FIELD);
+        }
+        this.number = doc.getString(NUMBER_FIELD);
         this.name = doc.getString(NAME_FIELD);
+        this.spec = doc.getString(SPEC_FIELD);
     }
 
     public UserInfo(Long userId) {
         this.userId = userId;
     }
 
-    public UserInfo setNumber(int number){
+    public UserInfo setNumber(String number) {
         BasicDBObject query = new BasicDBObject();
         query.put(USER_ID_FIELD, userId);
 
@@ -35,7 +42,7 @@ public final class UserInfo extends DBClass<UserInfo> {
         return this;
     }
 
-    public Integer getNumber(){
+    public String getNumber() {
         return number;
     }
 
@@ -48,13 +55,13 @@ public final class UserInfo extends DBClass<UserInfo> {
         return this;
     }
 
-    public static UserInfo getById(Long userId){
+    public static UserInfo getById(Long userId) {
         BasicDBObject query = new BasicDBObject();
         query.put(USER_ID_FIELD, userId);
         return DBUtil.getInstance().get(query, UserInfo.class).stream().findFirst().orElse(null);
     }
 
-    public static UserInfo getByNumber(Integer number){
+    public static UserInfo getByNumber(String number) {
         BasicDBObject query = new BasicDBObject();
         query.put(NUMBER_FIELD, number);
 
@@ -69,7 +76,6 @@ public final class UserInfo extends DBClass<UserInfo> {
 
     @Override
     protected void regenerateIndexes(MongoCollection<UserInfo> table) {
-//        DBUtil.getInstance().getTable(INSTANCE, UserInfo.class).insertOne(INSTANCE);
         table.createIndex(Indexes.text("userId"), new IndexOptions().unique(true).background(true));
         table.createIndex(Indexes.ascending("number"), new IndexOptions().unique(true).background(true));
         isIndexesHasBeenGenerated = true;
@@ -86,6 +92,7 @@ public final class UserInfo extends DBClass<UserInfo> {
         doc.append(USER_ID_FIELD, userId);
         doc.append(NUMBER_FIELD, number);
         doc.append(NAME_FIELD, name);
+        doc.append(SPEC_FIELD, spec);
         return doc;
     }
 
@@ -97,5 +104,5 @@ public final class UserInfo extends DBClass<UserInfo> {
     private final static String USER_ID_FIELD = "userId";
     private final static String NUMBER_FIELD = "number";
     private final static String NAME_FIELD = "name";
-
+    private final static String SPEC_FIELD = "spec";
 }

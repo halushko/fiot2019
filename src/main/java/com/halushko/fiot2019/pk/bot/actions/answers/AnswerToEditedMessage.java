@@ -2,6 +2,7 @@ package com.halushko.fiot2019.pk.bot.actions.answers;
 
 import com.halushko.fiot2019.pk.bot.Bot;
 import com.halushko.fiot2019.pk.bot.actions.entities.AnswerInDB;
+import com.halushko.fiot2019.pk.bot.actions.entities.Task;
 import org.telegram.telegrambots.meta.api.objects.Message;
 
 import java.io.UnsupportedEncodingException;
@@ -19,7 +20,7 @@ public class AnswerToEditedMessage extends Answer<String> {
     }
 
     @Override
-    protected Message answer(String answer, Message msg) {
+    protected Message answer(String answer, Task msg) {
         String str;
         try {
             str = " або натисніть на " +
@@ -30,7 +31,7 @@ public class AnswerToEditedMessage extends Answer<String> {
             str = "";
         }
         return Bot.sendTextMessage(
-                msg.getChatId(),
+                msg.getUserId(),
                 msg.getMessageId(),
                 answer + str,
                 str.equals("") ? null : "markdown"

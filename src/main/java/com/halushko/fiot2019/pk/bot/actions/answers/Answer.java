@@ -1,7 +1,7 @@
 package com.halushko.fiot2019.pk.bot.actions.answers;
 
 import com.halushko.fiot2019.pk.bot.actions.entities.AnswerInDB;
-import com.halushko.fiot2019.pk.bot.db.DBUtil;
+import com.halushko.fiot2019.pk.bot.actions.entities.Task;
 import org.telegram.telegrambots.meta.api.objects.Message;
 
 public abstract class Answer<T> {
@@ -11,12 +11,12 @@ public abstract class Answer<T> {
         this.answer = answer;
     }
 
-    public final AnswerInDB answer(Message msg) {
-        return new AnswerInDB(answer(answer, msg), getKey());
+    public final AnswerInDB answer(Task task) {
+        return new AnswerInDB(answer(answer, task), getKey());
     }
 
     public abstract String getKey();
-    protected abstract Message answer(T answer, Message msg);
+    protected abstract Message answer(T answer, Task msg);
 //
 //    public void save(Message message, String key) {
 //        if(message == null) return;

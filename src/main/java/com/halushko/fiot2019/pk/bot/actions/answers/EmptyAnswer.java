@@ -1,5 +1,6 @@
 package com.halushko.fiot2019.pk.bot.actions.answers;
 
+import com.halushko.fiot2019.pk.bot.actions.entities.Task;
 import org.telegram.telegrambots.meta.api.objects.Message;
 
 public final class EmptyAnswer extends Answer<String> {
@@ -13,7 +14,7 @@ public final class EmptyAnswer extends Answer<String> {
     }
 
     @Override
-    protected Message answer(String answer, Message msg) {
+    protected Message answer(String answer, Task msg) {
         return null;
     }
 }

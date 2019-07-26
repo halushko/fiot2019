@@ -24,6 +24,7 @@ public class Task extends DBClass<Task> {
     private final Integer date;
     private byte flags = 0;
     private final String text;
+    private final Integer messageId;
 
     private Task(Document document) {
         if (!document.isEmpty()) {
@@ -32,12 +33,14 @@ public class Task extends DBClass<Task> {
             flags = document.getInteger(FLAGS_FIELD).byteValue();
             text = document.getString(TEXT_FIELD);
             date = document.getInteger(DATE_FIELD);
+            messageId = document.getInteger(MESSAGE_ID_FIELD);
         } else {
             flags = 0;
             taskId = "NULL" + new Date().getTime() + new Random().nextInt(1000);
             userId = Long.MAX_VALUE;
             text = "";
             date = 0;
+            messageId = 0;
         }
     }
 
@@ -58,6 +61,7 @@ public class Task extends DBClass<Task> {
         this.flags |= getMessage().hasDocument() ? (byte) 4 : (byte) 0;
 
         this.userId = getMessage().getChatId();
+        this.messageId = getMessage().getMessageId();
         this.text = isText() ? getMessage().getText() : isDocument() ? getMessage().getDocument().getFileId() : "UNSUPPORTED";
         this.date = getMessage().getDate();
         this.taskId = generateUniqueIndexField();
@@ -77,6 +81,10 @@ public class Task extends DBClass<Task> {
 
     public String getTaskId() {
         return taskId;
+    }
+
+    public Integer getMessageId(){
+        return messageId;
     }
 
     public Long getUserId() {
@@ -196,6 +204,7 @@ public class Task extends DBClass<Task> {
         doc.append(DATE_FIELD, getDate());
         doc.append(FLAGS_FIELD, flags);
         doc.append(TEXT_FIELD, getText());
+        doc.append(MESSAGE_ID_FIELD, messageId);
         return doc;
     }
 
@@ -209,4 +218,5 @@ public class Task extends DBClass<Task> {
     private final static String DATE_FIELD = "date";
     private final static String FLAGS_FIELD = "flags";
     private final static String TEXT_FIELD = "text";
+    private final static String MESSAGE_ID_FIELD = "messageId";
 }

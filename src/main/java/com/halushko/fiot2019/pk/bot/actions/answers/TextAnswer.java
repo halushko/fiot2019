@@ -1,6 +1,7 @@
 package com.halushko.fiot2019.pk.bot.actions.answers;
 
 import com.halushko.fiot2019.pk.bot.Bot;
+import com.halushko.fiot2019.pk.bot.actions.entities.Task;
 import org.telegram.telegrambots.meta.api.objects.Message;
 
 public class TextAnswer extends Answer<String> {
@@ -14,7 +15,7 @@ public class TextAnswer extends Answer<String> {
     }
 
     @Override
-    protected Message answer(String answer, Message msg) {
-        return Bot.sendTextMessage(msg.getChatId(), null, answer, null);
+    protected Message answer(String answer, Task msg) {
+        return Bot.sendTextMessage(msg.getUserId(), null, answer, null);
     }
 }
