@@ -3,17 +3,16 @@ package com.halushko.fiot2019.pk.bot.actions.answers;
 import com.halushko.fiot2019.pk.bot.Bot;
 import com.halushko.fiot2019.pk.bot.actions.entities.Task;
 import com.halushko.fiot2019.pk.bot.actions.entities.UserInfo;
-import com.halushko.fiot2019.pk.bot.db.DBUtil;
 import org.telegram.telegrambots.meta.api.objects.Message;
 
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.ArrayList;
+import java.util.List;
 
 public class InputSpecialty extends Answer<Object> {
-    static Set<String> SPECIALITY = new TreeSet<String>() {{
+    static List<String> SPECIALITY = new ArrayList<String>() {{
         add("121");
-        add("126");
         add("123");
+        add("126");
     }};
 
     public InputSpecialty() {
@@ -27,12 +26,6 @@ public class InputSpecialty extends Answer<Object> {
 
     @Override
     protected Message answer(Object answer, Task msg) {
-        UserInfo user = UserInfo.getById(msg.getUserId());
-        if (user == null) {
-            user = new UserInfo(msg.getUserId());
-            DBUtil.getInstance().insert(user);
-        }
-
         return setSpec(msg);
     }
 
@@ -43,7 +36,7 @@ public class InputSpecialty extends Answer<Object> {
                         replaceAll("^спеціальність ", "").
                         replaceAll("\\s+", " ").trim();
         String delimiter = ", ";
-        StringBuilder specConcat = new StringBuilder("Помилка \uD83D\uDE15\nНа нашому факультеті присутні тільки три спеціальності: ");
+        StringBuilder specConcat = new StringBuilder("Помилка \uD83D\uDE15\nНа нашому факультеті присутні тільки спеціальності: ");
         for (String spec : SPECIALITY) {
             if (spec.equalsIgnoreCase(textMessage)) {
                 String t = "Спеціальність " + textMessage + " обрано";

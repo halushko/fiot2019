@@ -108,7 +108,8 @@ public final class UserInfo extends DBClass<UserInfo> {
     }
 
     private void save() {
-        if (getById(userId) == null) {
+        UserInfo u = getById(userId);
+        if(u == null) {
             DBUtil.getInstance().insert(this);
         } else {
             DBUtil.getInstance().update(getQuery(userId), UserInfo.class, toDocument());

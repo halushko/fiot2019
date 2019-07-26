@@ -42,11 +42,11 @@ public class InputName extends Answer<Object> {
 
         capitalizeWord = new StringBuilder(capitalizeWord.toString().trim());
         if (capitalizeWord.toString().matches("\\s*\\S+\\s+\\S+\\s+\\S+\\s*")) {
-            String text = "Ви зареєструвалися у боті приймальної комісії ФІОТ. Ваше ім'я: " + capitalizeWord;
+            String text = "Ви зареєстрували ім'я у боті приймальної комісії ФІОТ. Ваше ім'я: " + capitalizeWord;
             UserInfo.getById(task.getUserId()).setName(capitalizeWord.toString());
             return Bot.sendTextMessage(task.getUserId(), task.getMessageId(), text, null);
         } else {
-            String t = "Помилка \uD83D\uDE15\nДля реєстрації введіть свої ПІБ у форматі:\n/name Петренко Петро Петрович\n\tабо ПІБ Петренко Петро Петрович";
+            String t = "Помилка \uD83D\uDE15\nДля реєстрації введіть свої ПІБ у форматі:\n/name <Петренко Петро Петрович>\n\tабо просто напишіть повідомлення <ПІБ Петренко Петро Петрович>";
             t += "\nРеєстрація у Телегам не є обов'язковую, та вона покращить та пришвидчить прийом Ваших документів.";
             return Bot.sendTextMessage(task.getUserId(), task.getMessageId(), t, null);
         }

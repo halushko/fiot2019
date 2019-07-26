@@ -9,12 +9,12 @@ public class RegexpTrigger extends Question<String> {
     private final Pattern pattern;
 
     public RegexpTrigger(String input) {
-        this.pattern = Pattern.compile((input == null ? "" : input).trim(), Pattern.CASE_INSENSITIVE);
+        this.pattern = Pattern.compile((input == null ? "" : input).trim().toLowerCase(), Pattern.CASE_INSENSITIVE);
     }
 
     @Override
     protected boolean validateRealisation(String input) {
-        return input != null && pattern.matcher(input).matches();
+        return input != null && pattern.matcher(input.toLowerCase()).matches();
     }
 
     @Override

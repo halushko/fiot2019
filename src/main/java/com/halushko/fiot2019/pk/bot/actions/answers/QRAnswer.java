@@ -34,6 +34,9 @@ public final class QRAnswer extends Answer<Object>{
     @Override
     protected Message answer(Object answer, Task task) {
         UserInfo userInfo = UserInfo.getById(task.getUserId());
+        if(userInfo == null) {
+            userInfo = new UserInfo(task.getUserId());
+        }
         if(userInfo.getName() == null || userInfo.getName().trim().equals("")){
             return wrongName(userInfo.userId);
         }
@@ -100,14 +103,16 @@ public final class QRAnswer extends Answer<Object>{
     }
 
     private static Message error(long userId) {
-        return Bot.sendTextMessage(userId, null, "ERROR1", null);
+        return Bot.sendTextMessage(userId, null, "Щось пішло не так", null);
     }
 
     private Message wrongName(long userId) {
-        return Bot.sendTextMessage(userId, null, "ERROR2", null);
+        return Bot.sendTextMessage(userId, null, "Вибачте, Ваше ім'я або не задано, або має невірний формат.\n" +
+                "Отримайте довідку за командою /help", null);
     }
 
     private Message wrongSpecialisation(long userId) {
-        return Bot.sendTextMessage(userId, null, "ERROR3", null);
+        return Bot.sendTextMessage(userId, null, "Вибачте, Ви не вибрали спеціальність на яку подпєте докумени.\n" +
+                "Отримайте довідку за командою /help", null);
     }
 }
