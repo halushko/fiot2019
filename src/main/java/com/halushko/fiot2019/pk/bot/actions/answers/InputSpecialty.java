@@ -9,14 +9,14 @@ import org.telegram.telegrambots.meta.api.objects.Message;
 import java.util.Set;
 import java.util.TreeSet;
 
-public class Specialty extends Answer<Object> {
-    private static Set<String> SPECIALITY = new TreeSet<String>() {{
+public class InputSpecialty extends Answer<Object> {
+    static Set<String> SPECIALITY = new TreeSet<String>() {{
         add("121");
         add("126");
         add("123");
     }};
 
-    public Specialty() {
+    public InputSpecialty() {
         super("");
     }
 
@@ -47,10 +47,12 @@ public class Specialty extends Answer<Object> {
         for (String spec : SPECIALITY) {
             if (spec.equalsIgnoreCase(textMessage)) {
                 String t = "Спеціальність " + textMessage + " обрано";
+                UserInfo.getById(task.getUserId()).setSpecialisation(spec);
                 return Bot.sendTextMessage(task.getUserId(), task.getMessageId(), t, null);
             }
             specConcat.append(spec).append(delimiter);
         }
+
         return Bot.sendTextMessage(task.getUserId(), task.getMessageId(), specConcat.toString().replaceAll(delimiter + "$", ""), null);
     }
 }

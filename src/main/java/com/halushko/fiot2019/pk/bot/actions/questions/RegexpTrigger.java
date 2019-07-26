@@ -9,7 +9,7 @@ public class RegexpTrigger extends Question<String> {
     private final Pattern pattern;
 
     public RegexpTrigger(String input) {
-        this.pattern = Pattern.compile((input == null ? "" : input).trim().toLowerCase());
+        this.pattern = Pattern.compile((input == null ? "" : input).trim(), Pattern.CASE_INSENSITIVE);
     }
 
     @Override

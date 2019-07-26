@@ -12,6 +12,7 @@ import org.telegram.telegrambots.meta.TelegramBotsApi;
 import org.telegram.telegrambots.meta.api.methods.GetFile;
 import org.telegram.telegrambots.meta.api.methods.send.SendDocument;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
@@ -107,13 +108,21 @@ public class Bot extends TelegramLongPollingBot {
         }
     }
 
-    public static void sendDocument(Message msg, File file, String... params) {
+    public static Message sendDocument(long chatId, File file, String... params) {
         try {
-            SendDocument send = new SendDocument().setChatId(msg.getChatId());
-            send.setDocument(file);
-            getInstance().execute(send);
+            SendPhoto send = new SendPhoto().setChatId(chatId);
+            if(params != null && params.length > 0) {
+                send.setCaption(params[0]);
+            }
+            send.setPhoto(file);
+            return getInstance().execute(send);
         } catch (Exception ignored) {
+            return null;
         }
+    }
+
+    public static String getBotName(){
+        return getInstance().getBotUsername();
     }
 
     @Override

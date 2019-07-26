@@ -26,6 +26,14 @@ public final class DBUtil {
         getTable(object).insertOne(object.toDocument());
     }
 
+    public <G extends DBClass> long getCount(BasicDBObject query, Class<G> clazz){
+        return getTable(DBClass.getEmpty(clazz)).countDocuments(query);
+    }
+
+    private <G> MongoCollection<Document> getTable(G empty) {
+        return null;
+    }
+
     public <G extends DBClass> Set<G> get(BasicDBObject query, Class<G> clazz){
         Set<G> result = new HashSet<>();
         for(Document a: getTable(DBClass.getEmpty(clazz)).find(query)){

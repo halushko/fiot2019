@@ -38,14 +38,40 @@ public final class Answers {
         editedMessages();
         addStart();
         addHelp();
-        addRegister();
+        addName();
         addSpec();
         readPDF();
+        writeQR();
+        registerNewUser();
+        adminRegisterNewUser();
+
+    }
+
+    private static void adminRegisterNewUser() {
+        Queue<Answer> myAnswers = new LinkedList<>();
+        myAnswers.add(new RegisterWithoutTelegram());
+
+        Answers.answers.put(new RegexpTrigger("/admin_register_\\d+\\s+.+"), myAnswers);
+    }
+
+    private static void registerNewUser() {
+        Queue<Answer> myAnswers = new LinkedList<>();
+        myAnswers.add(new Register());
+
+        Answers.answers.put(new RegexpTrigger("/start register_\\d+"), myAnswers);
+    }
+
+    private static void writeQR() {
+        Queue<Answer> myAnswers = new LinkedList<>();
+        myAnswers.add(new QRAnswer());
+
+        Answers.answers.put(new RegexpTrigger("/qr"), myAnswers);
+        Answers.answers.put(new RegexpTrigger("qr"), myAnswers);
     }
 
     private static void addSpec() {
         Queue<Answer> myAnswers = new LinkedList<>();
-        myAnswers.add(new Specialty());
+        myAnswers.add(new InputSpecialty());
 
         Answers.answers.put(new RegexpTrigger("/spec.*"), myAnswers);
         Answers.answers.put(new RegexpTrigger("спеціальність.*"), myAnswers);
@@ -71,9 +97,9 @@ public final class Answers {
         Answers.answers.put(new RegexpTrigger("допомога"), myAnswers);
     }
 
-    private static void addRegister() {
+    private static void addName() {
         Queue<Answer> myAnswers = new LinkedList<>();
-        myAnswers.add(new Register());
+        myAnswers.add(new InputName());
 
         Answers.answers.put(new RegexpTrigger("/name.*"), myAnswers);
         Answers.answers.put(new RegexpTrigger("піб.*"), myAnswers);

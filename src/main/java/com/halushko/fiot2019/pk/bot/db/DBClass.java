@@ -11,7 +11,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public abstract class DBClass<T extends DBClass> {
-    protected final static Map<Class<? extends DBClass>, DBClass> EMPTY = new HashMap<>();
+    private final static Map<Class<? extends DBClass>, DBClass> EMPTY = new HashMap<>();
 
     public static void init() {
         EMPTY.put(AnswerInDB.class, AnswerInDB.INSTANCE);
@@ -19,7 +19,7 @@ public abstract class DBClass<T extends DBClass> {
         EMPTY.put(UserInfo.class, UserInfo.INSTANCE);
     }
 
-    public static <G> G getEmpty(Class<G> clazz) {
+    static <G> G getEmpty(Class<G> clazz) {
         return (G) EMPTY.get(clazz);
     }
 
@@ -31,11 +31,10 @@ public abstract class DBClass<T extends DBClass> {
 
     public abstract String tableName();
 
-    protected abstract void regenerateIndexes(MongoCollection<T> table);
+    public abstract Document toDocument();
+    public abstract T toJavaObject(Document doc);
 
+    protected abstract void regenerateIndexes(MongoCollection<T> table);
     protected abstract boolean isIndexesHasBeenGenerated();
 
-    public abstract Document toDocument();
-
-    public abstract T toJavaObject(Document doc);
 }

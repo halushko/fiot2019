@@ -26,6 +26,7 @@ public class AnswerToEditedMessage extends Answer<String> {
             str = " або натисніть на " +
                     "[цей текст](https://t.me/share/url?url=";
             str += URLEncoder.encode(msg.getText(), StandardCharsets.UTF_8.toString());
+            str = str.replaceAll("\\+", "%20");
             str += ") та виберіть серед переліку чатів нашого бота.";
         } catch (UnsupportedEncodingException e) {
             str = "";
